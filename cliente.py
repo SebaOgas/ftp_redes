@@ -4,21 +4,73 @@ Implementar una aplicación cliente de FTP, con las siguientes características:
     Se debe poder subir y bajar archivos desde un servidor de FTP.
 """
 import ftplib
+import sys
+import os
+
+def cls():
+    os.system('cls' if os.name=='nt' else 'clear')
+
+cls()
+
+if len(sys.argv) < 1:
+    raise Exception("Ingrese la IP")
+
+ip = sys.argv[1]
+port = int(sys.argv[2])
+
+if port is None:
+    port = 21
 
 with ftplib.FTP() as ftp:
     # conexión al servidor local
-    ftp.connect('127.0.0.1', 2121)
+    ftp.connect(ip, port)
     
     # obtener mensaje de bienvenida
     print(ftp.getwelcome())
 
     # identificación
-    ftp.login('admin', 'admin')
+    user = input("Usuario: ")
+    pw = input("Contraseña: ")
+    ret_login = ""
+    end = False
 
-    # ver directorio
-    print(ftp.retrlines('LIST'))
+    try:
+        ret_login = ftp.login(user, pw)
+    except ftplib.error_perm as e:
+        ret_login = e
+        end = True
+    
+    print(ret_login)
 
-    # crear directorio
+    
+    while not end:
+        line = input("> ")
+        words = line.split(" ")
+        cmd = words[0].lower()
+        try:
+            match cmd:
+                case "help":
+                    print("Comandos: ")
+                    print("ls: Listar contenidos del directorio actual")
+                case "exit":
+                    end = True
+                case "clear":
+                    cls()
+                case "ls":
+                    print(ftp.retrlines('LIST'))
+                case "cd":
+                    if len(words) != 2:
+                        raise Exception("Debe ingresar la ruta del directorio")
+                    ftp.cwd(words[1])
+        except Exception as e:
+            print(e)
+
+
+            
+
+
+
+    """ # crear directorio
     ftp.mkd(f'ejemplo_1')
     print('Creado directorio ejemplo_1\n')
     
@@ -27,7 +79,7 @@ with ftplib.FTP() as ftp:
     print('Cambiar a directorio ejemplo_1\n')
 
     #subir un fichero de texto
-    with open('prueba.txt', 'rb') as txt_file:
+    with open('test.txt', 'rb') as txt_file:
         ftp.storbinary('STOR prueba_up.txt', txt_file)
 
     # ver directorio
@@ -39,3 +91,4 @@ with ftplib.FTP() as ftp:
 
     # ver directorio
     print(ftp.retrlines('LIST'))
+ """
