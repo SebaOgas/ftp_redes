@@ -15,9 +15,6 @@ def cls():
 
 cls()
 
-def lcd(dir):
-    os.system(f'cd {dir}' if os.name=='nt' else f'cd {dir}')
-
 if len(sys.argv) < 2:
     print("Error: Ingrese la IP")
     exit()
@@ -121,7 +118,7 @@ with ftplib.FTP() as ftp:
                 case "lcd":
                     if len(words) != 2:
                         raise Exception("Debe ingresar el nombre del directorio local")
-                    lcd(words[1])
+                    os.chdir(words[1])
                     print("Directorio actual: "+words[1])
                 case "lls":
                     for item in os.listdir():
